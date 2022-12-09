@@ -2,6 +2,19 @@
 var express = require("express");
 var router = express.Router();
 
+const bodyParser = (req, res, next) => {
+  let bodyData = "";
+  req.on("data", (data) => {
+    bodyData += data;
+  });
+  req.on("end", () => {
+    if (bodyData) {
+      req.body = JSON.parse(bodyData);
+    }
+    next();
+  });
+};
+
 /*** get all users*/
 router.get("/", function (req, res, next) {
   return res.json("all users sent");
@@ -17,8 +30,8 @@ router.get("/:id", function (req, res, next) {
 });
 
 /*** Add a user*/
-router.post("/", function (req, res, next) {
-  let content = req.params;
+router.post("/", bodyParser, function (req, res, next) {
+  let content = req.body;
   if (content.id) {
     //just to demo
     return res.status(201).json("user created");
